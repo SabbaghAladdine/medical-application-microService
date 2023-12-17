@@ -1,6 +1,8 @@
 package com.example.patientservice.Controllers;
 
+import com.example.patientservice.clients.doctorRESTClient;
 import com.example.patientservice.entities.patient;
+import com.example.patientservice.model.Doctor;
 import com.example.patientservice.services.IPatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,9 @@ import java.util.List;
 public class patientController {
 
     @Autowired
+    doctorRESTClient drc;
+
+    @Autowired
     IPatientService ds;
 
     @GetMapping("/find")
@@ -23,11 +28,13 @@ public class patientController {
 
     @GetMapping("/find/{id}")
     public ResponseEntity<patient> findPatient(@PathVariable("id") int id){
-        patient d = ds.findpatientById(id);
-        if (d==null){
+        patient p = ds.findpatientById(id);
+        if (p==null){
             return ResponseEntity.notFound().build();
         }else {
-            return ResponseEntity.ok(d);
+            Doctor d = drc.findById(p.getDoctorId());
+            p.setDoctor(d);
+            return ResponseEntity.ok(p);
         }
     }
 
